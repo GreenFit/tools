@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>JSON工具</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./lib/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="./json/json.format.css" rel="stylesheet">
+    <link href="./json/tool-json.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="tool">
+                    <a href="#" class="clear" data-placement="bottom" title="清空"><i class="fa fa-trash"></i></a>
+                </div>
+                <textarea class="form-control json-input" placeholder="在此输入json字符串..."></textarea>
+            </div>
+            <div class="col-md-6">
+                <div class="tool">
+                    <a href="#" data-placement="bottom" title="复制"><i class="fa fa-copy"></i></a>
+                    <a href="#" class="zip" data-placement="bottom" title="压缩"><i class="fa fa-database"></i></a>
+                </div>
+                <div class="json-div">
+                    <div class="line-number"></div>
+                    <div class="json-output"></div>
+                </div>
+            </div>
+        </div>
+        <div class="time"></div>
+    </div>
+    <script src="./lib/jquery/jquery.min.js"></script>
+    <script src="./lib/jquery/jquery.numberedtextarea.js"></script>
+    <script src="./lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="./lib/jsonlint/jsonlint.min.js"></script>
+    <script src="./json/json.format.js"></script>
+    <script>
+        function renderLine() {
+            let number = $('.json-output').find('br').length + 1;
+            $('.line-number').html("");
+            let numberHtml = "";
+            for (var i = 1; i < number + 1; i++) {
+                numberHtml += `<div>${i}</div>`;
+            }
+            $('.line-number').html(numberHtml);
+
+            // $('.line-number').show();
+            // $('.numberedtextarea-line-numbers').show();
+        }
+
+        function getJsonResult(notFormat) {
+            let content = $.trim($('.json-input').val());
+            let result = ''
+            if (content !== '') {
+                try {
+                    const time1 = new Date().getTime()
+                    let lint = jsonlint.parse(content)
+                    let json = JSON.stringify(lint)
+                    const time2 = new Date().getTime()
+                    $(".time").html(`JSON解析耗时:${time2 - time1}ms, `)
+                    if(notFormat) {
+                        result = json;
+                    } else {
+                        const time3 = new Date().getTime()
+                        result = JSONFormat(json);
+                        const time4 = new Date().getTime()
+                        $(".time").html(`${$(".time").html()}JSON格式化耗时:${time4 - time3}ms, `)
+                    }
+                } catch (e) {
+                    result = `<span class="error-info">${e}</span>`;
+                }
+            }
+            return result;
+        }
+
+        function parseJson() {
+            const time1 = new Date().getTime()
+            $('.json-output').html(getJsonResult())
+            renderLine()
+            const time2 = new Date().getTime()
+            $(".time").html(`${$(".time").html()}耗时:${time2 - time1}ms`)
+        }
+
+        function compressJSON() {
+            let str = getJsonResult(true)
+            $('.json-output').html(`<span>${str}</span>`)
+        }
+
+        function changeAreaHeight() {
+            let height = 20 + $(".numberedtextarea-line-numbers").children().length * 19 + 'px'
+            $('.json-input').css('height', height)
+        }
+
+        function clearInfo() {
+            $('.json-input').val('')
+            $('.json-output').html('')
+            changeAreaHeight()
+            renderLine()
+        }
+
+        // 输入框添加行号
+        $('.json-input').numberedtextarea()
+        
+        // 工具栏添加提示信息
+        $('.tool a').tooltip()
+        $('.json-input').on('keyup', parseJson)
+        $('.json-input').on('input', changeAreaHeight)
+        $('.zip').on('click', compressJSON)
+        $('.clear').on('click', clearInfo)
+
+        // 初始化行数
+        $('.json-input').keyup()
+    </script>
+</body>
+</html>
