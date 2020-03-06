@@ -1,15 +1,13 @@
-import _ from 'lodash'
-import layui from 'layui-src'
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
 
-layui.use()
+Vue.config.productionTip = false
 
-function component() {
-    let element = document.createElement('div')
+const root = document.createElement('div')
+document.body.appendChild(root)
 
-    // lodash（目前通过一个 script 引入）对于执行这一行是必需的
-    element.innerHTML = _.join(['Hello', 'webpack'], ' ')
-
-    return element
-}
-
-document.body.appendChild(component());
+new Vue({
+  router,
+  render: h => h(App)
+}).$mount(root)
