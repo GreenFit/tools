@@ -1,6 +1,5 @@
 const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
@@ -10,11 +9,6 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new CopyWebpackPlugin([
-      { from: `assets/`, to: `static/` },
-      { from: `src/image`, to: `public/image` },
-      { from: `src/tool`, to: `tool` }
-    ]),
     new HtmlWebpackPlugin(),
     new VueLoaderPlugin()
   ],
@@ -22,12 +16,12 @@ module.exports = {
     filename: '[name].js',
     chunkFilename: '[name].js',
     path: path.resolve(__dirname, '../dist')
-    // publicPath: 'https://image.heleeos.com/blog/'
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.vue'],
     alias: {
-      '@': path.join(__dirname, '..', 'src')
+      '@': path.resolve('src/'),
+      '@tool': path.resolve('src/tool/')
     }
   },
   module: {
